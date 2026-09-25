@@ -31,10 +31,10 @@ PRICE = 85000
 
 # Batas waktu yang diinginkan bot.
 # Catatan: dokumentasi create API KlikQRIS tidak menyediakan parameter
-# "expired 15 menit" pada request. Karena itu bot menghentikan polling
-# setelah 15 menit. Masa berlaku invoice di sisi KlikQRIS mengikuti
+# expiry pada request. Karena itu bot menghentikan polling
+# setelah 60 menit. Masa berlaku invoice di sisi KlikQRIS mengikuti
 # kebijakan/API KlikQRIS.
-PAYMENT_TIMEOUT_SECONDS = 15 * 60
+PAYMENT_TIMEOUT_SECONDS = 60 * 60
 STATUS_CHECK_INTERVAL_SECONDS = 5
 
 ALL_GROUP_IDS = [
@@ -247,7 +247,7 @@ def finish_transaction(chat_id, order_id):
 
 def monitor_payment(chat_id, order_id, qr_message_id):
     """
-    Memantau status transaksi otomatis maksimal 15 menit.
+    Memantau status transaksi otomatis maksimal 60 menit.
     """
     started_at = time.time()
 
@@ -332,7 +332,7 @@ def monitor_payment(chat_id, order_id, qr_message_id):
 
         time.sleep(STATUS_CHECK_INTERVAL_SECONDS)
 
-    # Timeout lokal 15 menit.
+    # Timeout lokal 60 menit.
     with transaction_lock:
         tx = active_transactions.get(chat_id)
         if tx and tx.get("order_id") == order_id:
@@ -512,7 +512,7 @@ def process_show_qris(call):
             "Paket: <b>VIP 11 Grup</b>\n"
             f"Nominal: <b>Rp {int(float(total_amount)):,}</b>\n"
             f"Order ID: <code>{html.escape(returned_order_id)}</code>\n"
-            f"Batas pemantauan bot: <b>15 menit</b>\n"
+            f"Batas pemantauan bot: <b>60 menit</b>\n"
             f"Expired dari KlikQRIS: <b>{html.escape(str(expired_at))}</b>\n\n"
             "Silakan scan QR di atas dan lakukan pembayaran.\n\n"
             "✅ Setelah pembayaran berhasil, bot akan mendeteksi otomatis "
